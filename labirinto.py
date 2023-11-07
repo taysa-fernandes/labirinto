@@ -17,6 +17,7 @@ def carregar_labirinto(arquivo):
     with open(arquivo, "r") as arquivo_labirinto:
         linhas = arquivo_labirinto.readlines()
     labirinto = []
+
     for linha in linhas:
         linha_celulas = []
         for celula in linha.strip():
