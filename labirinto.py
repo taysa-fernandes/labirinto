@@ -50,29 +50,38 @@ for y, linha in enumerate(labirinto):
         if celula == 2:  # Encontre a posição inicial do jogador
             posicao_jogador_x = x
             posicao_jogador_y = y
+        elif celula == 3:  # Encontre a posição do queijo
+            posicao_objetivo_x = x
+            posicao_objetivo_y = y
 
 executando = True
+encontrou_queijo = False
+
 while executando:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             executando = False
         if evento.type == pygame.KEYDOWN:
-            if evento.key == pygame.K_LEFT:
-                if posicao_jogador_x > 0 and labirinto[posicao_jogador_y][posicao_jogador_x - 1] != 1:
-                    labirinto[posicao_jogador_y][posicao_jogador_x] = 0  # Apaga a posição anterior
-                    posicao_jogador_x -= 1
-            if evento.key == pygame.K_RIGHT:
-                if posicao_jogador_x < len(labirinto[0]) - 1 and labirinto[posicao_jogador_y][posicao_jogador_x + 1] != 1:
-                    labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-                    posicao_jogador_x += 1
-            if evento.key == pygame.K_UP:
-                if posicao_jogador_y > 0 and labirinto[posicao_jogador_y - 1][posicao_jogador_x] != 1:
-                    labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-                    posicao_jogador_y -= 1
-            if evento.key == pygame.K_DOWN:
-                if posicao_jogador_y < len(labirinto) - 1 and labirinto[posicao_jogador_y + 1][posicao_jogador_x] != 1:
-                    labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-                    posicao_jogador_y += 1
+            if not encontrou_queijo:
+                if evento.key == pygame.K_LEFT:
+                    if posicao_jogador_x > 0 and labirinto[posicao_jogador_y][posicao_jogador_x - 1] != 1:
+                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
+                        posicao_jogador_x -= 1
+                if evento.key == pygame.K_RIGHT:
+                    if posicao_jogador_x < len(labirinto[0]) - 1 and labirinto[posicao_jogador_y][posicao_jogador_x + 1] != 1:
+                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
+                        posicao_jogador_x += 1
+                if evento.key == pygame.K_UP:
+                    if posicao_jogador_y > 0 and labirinto[posicao_jogador_y - 1][posicao_jogador_x] != 1:
+                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
+                        posicao_jogador_y -= 1
+                if evento.key == pygame.K_DOWN:
+                    if posicao_jogador_y < len(labirinto) - 1 and labirinto[posicao_jogador_y + 1][posicao_jogador_x] != 1:
+                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
+                        posicao_jogador_y += 1
+
+                if labirinto[posicao_jogador_y][posicao_jogador_x] == 3:
+                    encontrou_queijo = True
 
     TELA.fill(BRANCO)
 
@@ -86,5 +95,6 @@ while executando:
 
     pygame.display.update()
 
-pygame.quit()
-sys.exit()
+    if encontrou_queijo:
+        pygame.quit()
+        sys.exit()
