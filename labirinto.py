@@ -48,49 +48,24 @@ imagens_celulas = {
 
 for y, linha in enumerate(labirinto):
     for x, celula in enumerate(linha):
-        if celula == 2:  
+        if celula == 2:
             posicao_jogador_x = x
             posicao_jogador_y = y
-        elif celula == 3:  
+        elif celula == 3:
             posicao_objetivo_x = x
             posicao_objetivo_y = y
 
 executando = True
 encontrou_queijo = False
 
-
 pilha = deque()
-pilha.append((posicao_jogador_x, posicao_jogador_y))
+pilha_solucao = deque()
+caminhos_visitados = set()
 
 while executando:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             executando = False
-        if not encontrou_queijo:
-            if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_LEFT:
-                    if posicao_jogador_x > 0 and labirinto[posicao_jogador_y][posicao_jogador_x - 1] != 1:
-                        pilha.append((posicao_jogador_x, posicao_jogador_y))
-                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-                        posicao_jogador_x -= 1
-                elif evento.key == pygame.K_RIGHT:
-                    if posicao_jogador_x < len(labirinto[0]) - 1 and labirinto[posicao_jogador_y][posicao_jogador_x + 1] != 1:
-                        pilha.append((posicao_jogador_x, posicao_jogador_y))
-                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-                        posicao_jogador_x += 1
-                elif evento.key == pygame.K_UP:
-                    if posicao_jogador_y > 0 and labirinto[posicao_jogador_y - 1][posicao_jogador_x] != 1:
-                        pilha.append((posicao_jogador_x, posicao_jogador_y))
-                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-                        posicao_jogador_y -= 1
-                elif evento.key == pygame.K_DOWN:
-                    if posicao_jogador_y < len(labirinto) - 1 and labirinto[posicao_jogador_y + 1][posicao_jogador_x] != 1:
-                        pilha.append((posicao_jogador_x, posicao_jogador_y))
-                        labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-                        posicao_jogador_y += 1
-
-            if posicao_jogador_x == posicao_objetivo_x and posicao_jogador_y == posicao_objetivo_y:
-                encontrou_queijo = True
 
     TELA.fill(BRANCO)
 
@@ -100,10 +75,44 @@ while executando:
             if imagem is not None:
                 TELA.blit(imagem, (x * TAMANHO_CELULA, y * TAMANHO_CELULA))
 
+    if not encontrou_queijo:
+        movimentos = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        movimento_valido = False
+
+        for movimento in movimentos:
+            nova_pos_x = posicao_jogador_x + movimento[0]
+            nova_pos_y = posicao_jogador_y + movimento[1]
+            
+            if (
+                0 <= nova_pos_x < len(labirinto[0])
+                and 0 <= nova_pos_y < len(labirinto)
+                and labirinto[nova_pos_y][nova_pos_x] != 1
+                and (nova_pos_x, nova_pos_y) not in caminhos_visitados
+            ):
+                movimento_valido = True
+                pilha.append((posicao_jogador_x, posicao_jogador_y))
+                caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
+                labirinto[posicao_jogador_y][posicao_jogador_x] = 0
+                posicao_jogador_x, posicao_jogador_y = nova_pos_x, nova_pos_y
+                pygame.time.delay(100)  # Atraso de 100 milissegundos
+
+                if posicao_jogador_x == posicao_objetivo_x and posicao_jogador_y == posicao_objetivo_y:
+                    encontrou_queijo = True
+                break
+
+        if not movimento_valido:
+            if pilha:
+                pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
+                posicao_jogador_x, posicao_jogador_y = pilha.pop()
+    else:
+        pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
+        if pilha_solucao:
+            posicao_jogador_x, posicao_jogador_y = pilha_solucao.popleft()
+
     TELA.blit(imagem_mouse, (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA))
 
     pygame.display.update()
 
-    if encontrou_queijo:
+    if encontrou_queijo and not pilha_solucao:
         pygame.quit()
         sys.exit()
