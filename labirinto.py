@@ -9,7 +9,6 @@ TELA = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Labirinto")
 
 BRANCO = (255, 255, 255)
-PRETO = (0, 0, 0)
 
 imagem_mouse = pygame.image.load("rato1.jpg")
 imagem_queijo = pygame.image.load("queijo.jpg")
@@ -93,7 +92,7 @@ while executando:
                 and labirinto[nova_pos_y][nova_pos_x] != 1
                 and (nova_pos_x, nova_pos_y) not in caminhos_visitados
             ):
-                posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y  # Armazena a posição anterior
+                posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y
                 movimento_valido = True
                 pilha.append((posicao_jogador_x, posicao_jogador_y))
                 caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
@@ -108,22 +107,24 @@ while executando:
         if not movimento_valido:
             if pilha:
                 pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
-                posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y  # Armazena a posição anterior
+                caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
+                posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y
                 posicao_jogador_x, posicao_jogador_y = pilha.pop()
+
     else:
         pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
         if pilha_solucao:
-            posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y  # Armazena a posição anterior
+            posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y
             posicao_jogador_x, posicao_jogador_y = pilha_solucao.pop()
+            caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
             labirinto[posicao_jogador_y][posicao_jogador_x] = 0
-            posicao_jogador_x, posicao_jogador_y = nova_pos_x, nova_pos_y
 
     TELA.blit(imagem_mouse, (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA))
 
     pygame.display.update()
 
-    if encontrou_queijo and not pilha_solucao:
+
+    if encontrou_queijo:
         print("achou queijo")
-        print("Posição anterior antes do beco sem saída:", posicao_anterior_x, posicao_anterior_y)
         pygame.quit()
         sys.exit()
