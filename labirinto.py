@@ -75,9 +75,12 @@ while executando:
 
     for y, linha in enumerate(labirinto):
         for x, celula in enumerate(linha):
-            imagem = imagens_celulas.get(celula, None)
-            if imagem is not None:
-                TELA.blit(imagem, (x * TAMANHO_CELULA, y * TAMANHO_CELULA))
+            if (x, y) in caminhos_visitados:
+                pygame.draw.rect(TELA, (255, 0, 0), (x * TAMANHO_CELULA, y * TAMANHO_CELULA, TAMANHO_CELULA, TAMANHO_CELULA))
+            else:
+                imagem = imagens_celulas.get(celula, None)
+                if imagem is not None:
+                    TELA.blit(imagem, (x * TAMANHO_CELULA, y * TAMANHO_CELULA))
 
     if not encontrou_queijo:
         movimentos = [(1, 0), (-1, 0), (0, 1), (0, -1)]
@@ -92,7 +95,6 @@ while executando:
                 and labirinto[nova_pos_y][nova_pos_x] != 1
                 and (nova_pos_x, nova_pos_y) not in caminhos_visitados
             ):
-                posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y
                 movimento_valido = True
                 pilha.append((posicao_jogador_x, posicao_jogador_y))
                 caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
@@ -110,19 +112,19 @@ while executando:
                 caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
                 posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y
                 posicao_jogador_x, posicao_jogador_y = pilha.pop()
+                pygame.draw.rect(TELA, (255, 0, 0), (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA, TAMANHO_CELULA, TAMANHO_CELULA))
 
     else:
-        pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
         if pilha_solucao:
             posicao_anterior_x, posicao_anterior_y = posicao_jogador_x, posicao_jogador_y
             posicao_jogador_x, posicao_jogador_y = pilha_solucao.pop()
             caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
             labirinto[posicao_jogador_y][posicao_jogador_x] = 0
+            pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
+            pygame.draw.rect(TELA, (255, 0, 0), (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA, TAMANHO_CELULA, TAMANHO_CELULA))
 
     TELA.blit(imagem_mouse, (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA))
-
     pygame.display.update()
-
 
     if encontrou_queijo:
         print("achou queijo")
