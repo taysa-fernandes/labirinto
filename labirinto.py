@@ -121,6 +121,10 @@ def main():
             print("achou queijo")
             pygame.quit()
             sys.exit()
+        else:
+            print("Labirinto sem saída")
+            pygame.quit()
+            sys.exit()
 
 if __name__ == "__main__":
     labirinto = carregar_labirinto("labirinto.txt")
