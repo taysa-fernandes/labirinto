@@ -15,7 +15,6 @@ IMAGEM_RATO = pygame.image.load("rato1.jpg")
 IMAGEM_QUEIJO = pygame.image.load("queijo.jpg")
 
 TAMANHO_CELULA = 20
-FPS = 30
 
 def carregar_labirinto(arquivo):
     with open(arquivo, "r") as arquivo_labirinto:
@@ -46,6 +45,20 @@ def desenhar_labirinto():
                 imagem = imagens_celulas.get(celula, None)
                 if imagem is not None:
                     TELA.blit(imagem, (x * TAMANHO_CELULA, y * TAMANHO_CELULA))
+
+def movimento_possivel(pos_x, pos_y):
+    movimentos = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    for movimento in movimentos:
+        nova_pos_x = pos_x + movimento[0]
+        nova_pos_y = pos_y + movimento[1]
+        if (
+            0 <= nova_pos_x < len(labirinto[0])
+            and 0 <= nova_pos_y < len(labirinto)
+            and labirinto[nova_pos_y][nova_pos_x] != 1
+            and (nova_pos_x, nova_pos_y) not in caminhos_visitados
+        ):
+            return True
+    return False
 
 def movimentar_jogador():
     global posicao_jogador_x, posicao_jogador_y
@@ -101,6 +114,11 @@ def main():
             movimento_valido = movimentar_jogador()
 
             if not movimento_valido:
+                if not movimento_possivel(posicao_jogador_x, posicao_jogador_y) and not pilha:
+                    print("Labirinto sem saída")
+                    pygame.quit()
+                    sys.exit()
+
                 retroceder_jogador()
 
         else:
@@ -110,7 +128,10 @@ def main():
                 caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
                 labirinto[posicao_jogador_y][posicao_jogador_x] = 0
                 pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
-                pygame.draw.rect(TELA, VERMELHO, (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA, TAMANHO_CELULA, TAMANHO_CELULA))
+                pygame.draw.rect(
+                    TELA, VERMELHO,
+                    (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA, TAMANHO_CELULA, TAMANHO_CELULA)
+                )
 
         TELA.blit(IMAGEM_RATO, (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA))
         pygame.display.update()
@@ -118,11 +139,7 @@ def main():
         pygame.time.delay(100)  
 
         if encontrou_queijo:
-            print("achou queijo")
-            pygame.quit()
-            sys.exit()
-        else:
-            print("Labirinto sem saída")
+            print("Achou o queijo!")
             pygame.quit()
             sys.exit()
 
