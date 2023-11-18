@@ -19,20 +19,28 @@ TAMANHO_CELULA = 20
 def carregar_labirinto(arquivo):
     with open(arquivo, "r") as arquivo_labirinto:
         linhas = arquivo_labirinto.readlines()
+        
     labirinto = []
+    encontrou_rato = False
 
-    for linha in linhas:
+    for y, linha in enumerate(linhas):
         linha_celulas = []
-        for celula in linha.strip():
+        for x, celula in enumerate(linha.strip()):
             if celula == '1':
                 linha_celulas.append(1)
             elif celula == '0':
                 linha_celulas.append(0)
             elif celula == 'm':
                 linha_celulas.append(2)
+                encontrou_rato = True
             elif celula == 'e':
                 linha_celulas.append(3)
         labirinto.append(linha_celulas)
+    
+    if not encontrou_rato:
+        print("Labirinto não possui entrada para o rato (m).")
+        sys.exit()
+
     return labirinto
 
 def desenhar_labirinto():
@@ -128,10 +136,7 @@ def main():
                 caminhos_visitados.add((posicao_jogador_x, posicao_jogador_y))
                 labirinto[posicao_jogador_y][posicao_jogador_x] = 0
                 pilha_solucao.append((posicao_jogador_x, posicao_jogador_y))
-                pygame.draw.rect(
-                    TELA, VERMELHO,
-                    (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA, TAMANHO_CELULA, TAMANHO_CELULA)
-                )
+                pygame.draw.rect(TELA, VERMELHO, (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA, TAMANHO_CELULA, TAMANHO_CELULA))
 
         TELA.blit(IMAGEM_RATO, (posicao_jogador_x * TAMANHO_CELULA, posicao_jogador_y * TAMANHO_CELULA))
         pygame.display.update()
